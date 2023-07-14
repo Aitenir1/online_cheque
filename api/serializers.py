@@ -30,7 +30,7 @@ class DishSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name_en', 'name_kg', 'name_ru',
                   'description_en', 'description_kg', 'description_ru',
                   'price', 'gram', 'category_name', 'image', 'additives',
-                  'is_trend',]
+                  'is_trend']
 
     @staticmethod
     def get_category_name(obj):
@@ -55,7 +55,6 @@ class OrderSerializer(serializers.ModelSerializer):
         try:
             order_items = validated_data.pop('items')
             order = Order.objects.create(**validated_data)
-
             total_sum = 0
             for order_item in order_items:
 
@@ -65,6 +64,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
                 for additive in additives:
                     total_sum += additive.price
+
                     if additive.dish != dish:
                         raise serializers.ValidationError(f'{dish.name_en} does not have {additive.name_en} additive')
 

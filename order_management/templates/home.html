@@ -1,0 +1,137 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'styles/home.css' %}">
+    <title>Document</title>
+</head>
+
+<body>
+<script src="{% static 'scripts/home.js' %}"></script>
+<header id="header">
+
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'icons/logo.svg' %}" alt="">
+            </a>
+
+            <div class="header-img">
+                <img src="{% static 'icons/menu.svg' %}" alt="">
+                <img src="{% static 'icons/settings.svg' %}" alt="">
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="hero">
+
+    <div class="container">
+
+        <div class="hero">
+            <div class="form">
+            <form method="GET" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="date" name="date">
+                <input type="submit" value="Save">
+            </form>
+                {% if date != None %}
+                    <h4>
+                        Список заказов за {{ date|date:"d/m/Y" }}
+                    </h4>
+                {% endif %}
+
+            </div>
+            {% for order in orders %}
+                <h1>{{ order.table }} {% if order.status %}(Закрыт){% endif %}</h1>
+                <i>{{ order.time_created|date:'H:i' }}</i>
+                <table>
+                    <tr>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Количество</th>
+                        <th>Итого</th>
+                    </tr>
+
+                    {% for order_item in order.items.all %}
+
+                    <tr>
+                        <td>{{ order_item.dish.name_ru }}</td>
+                        <td>{{ order_item.dish.price }}</td>
+                        <td>{{ order_item.quantity }}</td>
+                        <td>
+                            {% widthratio order_item.dish.price 1 order_item.quantity %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+
+                {% for order_item in order.items.all %}
+
+                    {% for additive in order_item.additives.all %}
+                        <tr>
+                            <td>{{additive.name_ru }}</td>
+                            <td>{{ additive.price }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+
+
+                <tr>
+                    <td><b>
+                        {% if order.is_takeaway %}
+                            С собой
+                        {% else %}
+                            Здесь
+                        {% endif %}
+                    </b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>
+                        {% if order.payment %}
+                            Наличка
+                        {% else %}
+                            Терминал
+                        {% endif %}
+                    </b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tr>
+                <tr>
+                    <td><b>Общая сумма:</b></td>
+                    <td><b>{{ order.total_price }}</b></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+{#                <tr>#}
+{#                    <td colspan="2">#}
+{#                        <form action="{% url 'get_cheque' order.id %}">#}
+{##}
+{#                            <input type="submit" value="Выдать чек">#}
+{#                        </form>#}
+{##}
+{#                        <a href="{% url 'complete_order' order.id %}">#}
+{#                            <input type="submit" value="Завершить заказ">#}
+{#                        </a>#}
+{#                    </td>#}
+{#                </tr>#}
+
+            </table>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
