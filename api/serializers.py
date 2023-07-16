@@ -54,8 +54,10 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict):
         try:
             order_items = validated_data.pop('items')
-            order = Order.objects.create(**validated_data)
-            total_sum = 0
+            table = validated_data.pop('table')
+            print(order_items)
+            order = Order.objects.get_or_create(table=table, status=0)[0]
+            total_sum = order.total_price
             for order_item in order_items:
 
                 dish = order_item['dish']
@@ -68,17 +70,21 @@ class OrderSerializer(serializers.ModelSerializer):
                     if additive.dish != dish:
                         raise serializers.ValidationError(f'{dish.name_en} does not have {additive.name_en} additive')
 
-                order_item_obj = OrderItem.objects.create(
-                    dish=dish,
-                    order=order,
-                    quantity=quantity
-                )
+                order_item_obj, created = OrderItem.objects.get_or_create(dish=dish, order=order)
+
+                if created:
+                    order_item_obj.quantity = quantity
+                else:
+                    order_item_obj.quantity += quantity
 
                 for additive in additives:
                     order_item_obj.additives.add(additive)
 
                 order_item_obj.save()
 
+                print("===================")
+                print(f'{dish.price=}')
+                print(f'{order_item_obj.quantity}')
                 total_sum += dish.price * quantity
 
             order.total_price = total_sum
@@ -86,6 +92,14 @@ class OrderSerializer(serializers.ModelSerializer):
         except serializers.ValidationError:
             order.delete()
             raise
+
+        comment = validated_data.get('comment', '-')
+        payment = validated_data.get('payment', 0)
+        is_takeaway = validated_data.get('is_takeaway', 0)
+
+        order.comment = comment
+        order.payment = payment
+        order.is_takeaway = is_takeaway
 
         order.save()
 

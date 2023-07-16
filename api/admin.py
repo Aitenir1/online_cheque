@@ -9,7 +9,7 @@ class OrderItemInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
-    list_display = ('id', 'table', 'get_dishes', 'total_price')
+    list_display = ('id', 'table', 'time_created', 'get_dishes', 'total_price')
 
     def get_dishes(self, obj):
         dishes = Dish.objects.filter(orderitem__order=obj)
