@@ -9,7 +9,7 @@ socket.onopen = function(e) {
 socket.onmessage = function(event) {
     console.log("Message received")
     try {
-        console.log(event);
+        console.log(JSON.parse(event.data));
     } catch (e) {
         console.log('Error:', e.message);
     }

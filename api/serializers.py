@@ -1,6 +1,13 @@
+from uuid import UUID
+from asgiref.sync import async_to_sync
+import json
 
 from rest_framework import serializers
+from channels.layers import get_channel_layer
+
 from .models import Dish, Category, Table, Order, OrderItem, Additive
+from .json_encoders import UUIDEncoder
+from .services.order_create_logic import create_order_from_json
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -52,58 +59,37 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'table', 'time_created', 'status', 'comment', 'payment', 'is_takeaway', 'total_price', 'items']
 
     def create(self, validated_data: dict):
-        try:
-            order_items = validated_data.pop('items')
-            table = validated_data.pop('table')
-            print(order_items)
-            order = Order.objects.get_or_create(table=table, status=0)[0]
-            total_sum = order.total_price
-            for order_item in order_items:
-
-                dish = order_item['dish']
-                quantity = order_item['quantity']
-                additives = order_item['additives']
-
-                for additive in additives:
-                    total_sum += additive.price
-
-                    if additive.dish != dish:
-                        raise serializers.ValidationError(f'{dish.name_en} does not have {additive.name_en} additive')
-
-                order_item_obj, created = OrderItem.objects.get_or_create(dish=dish, order=order)
-
-                if created:
-                    order_item_obj.quantity = quantity
-                else:
-                    order_item_obj.quantity += quantity
-
-                for additive in additives:
-                    order_item_obj.additives.add(additive)
-
-                order_item_obj.save()
-
-                print("===================")
-                print(f'{dish.price=}')
-                print(f'{order_item_obj.quantity}')
-                total_sum += dish.price * quantity
-
-            order.total_price = total_sum
-
-        except serializers.ValidationError:
-            order.delete()
-            raise
-
-        comment = validated_data.get('comment', '-')
+        table = validated_data.pop('table')
+        order_items = validated_data.pop('items')
         payment = validated_data.get('payment', 0)
         is_takeaway = validated_data.get('is_takeaway', 0)
+        comment = validated_data.get('comment', '-')
 
-        order.comment = comment
-        order.payment = payment
-        order.is_takeaway = is_takeaway
+        order = create_order_from_json(
+            table=table,
+            order_items=order_items,
+            payment=payment,
+            is_takeaway=is_takeaway,
+            comment=comment
+        )
 
-        order.save()
+        self.notify_consumer(instance=order)
 
         return order
+
+    def notify_consumer(self, instance) -> None:
+        channel_layer = get_channel_layer()
+
+        serializer = OrderSerializer(instance)
+        order_json = json.dumps(serializer.data, cls=UUIDEncoder)
+
+        async_to_sync(channel_layer.group_send)(
+            'model_instances',
+            {
+                'type': 'send_model_instance',
+                'instance': order_json
+            }
+        )
 
 
 class OrderItemGetSerializer(serializers.ModelSerializer):

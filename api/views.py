@@ -1,13 +1,12 @@
 # Thrid-party
-from rest_framework import viewsets, generics, views
+from rest_framework import generics
 
 # Django
-from django.shortcuts import render, redirect, HttpResponse
 from django.db.models.functions import TruncDate
 
 # Local Django
 from .models import Dish, Order
-from .serializers import DishSerializer, OrderSerializer, OrderGetSerializer
+from .serializers import DishSerializer, OrderSerializer
 
 
 class DishListApi(generics.ListAPIView):
