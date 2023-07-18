@@ -30,5 +30,4 @@ urlpatterns = [
     path("dishes/", DishListApi.as_view()),
     path("create-order/", OrderCreateApi.as_view()),
     path("orders/", OrderListApi.as_view())
-    # path("orders/", Order)
 ]

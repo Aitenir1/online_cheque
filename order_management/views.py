@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from django.http.response import HttpResponse
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import ListView

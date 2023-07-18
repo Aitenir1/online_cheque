@@ -15,4 +15,4 @@ class OrderConsumer(AsyncWebsocketConsumer):
 
     async def send_model_instance(self, event):
         instance = event['instance']
-        await self.send(text_data=json.dumps(instance))
+        await self.send(text_data=instance)
