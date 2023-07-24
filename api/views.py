@@ -6,7 +6,7 @@ from django.db.models.functions import TruncDate
 
 # Local Django
 from .models import Dish, Order
-from .serializers import DishSerializer, OrderSerializer
+from .serializers import DishSerializer, OrderSerializer, OrderGetSerializer
 
 
 class DishListApi(generics.ListAPIView):
@@ -20,13 +20,15 @@ class OrderCreateApi(generics.CreateAPIView):
 
 
 class OrderListApi(generics.ListAPIView):
-    serializer_class = OrderSerializer
+    serializer_class = OrderGetSerializer
 
     def get_queryset(self):
         date = self.request.query_params.get('date')
+        if date is not None:
+            print(date)
+            orders = Order.objects.annotate(
+                date=TruncDate('time_created')
+            ).filter(date=date)
 
-        orders = Order.objects.annotate(
-            date=TruncDate('time_created')
-        ).filter(date=date)
-
-        return orders
+            return orders
+        return Order.objects.all()
