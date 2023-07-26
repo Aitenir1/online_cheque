@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 
 from .models import Dish, Category, Table, Order, OrderItem, Additive
 from .json_encoders import UUIDEncoder
-from .services.order_create_logic import create_order_from_json
+from .utils.order_create_logic import create_order_from_json
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -75,6 +75,7 @@ class OrderSerializer(serializers.ModelSerializer):
         self.notify_consumer(instance=order)
 
         return order
+
 
     def notify_consumer(self, instance) -> None:
         channel_layer = get_channel_layer()
