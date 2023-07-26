@@ -97,7 +97,6 @@ class OrderItemGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        # fields = '__all__'
         fields = ['dish', 'quantity', 'additives']
 
 class OrderGetSerializer(serializers.ModelSerializer):
