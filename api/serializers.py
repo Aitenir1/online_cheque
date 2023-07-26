@@ -64,7 +64,6 @@ class OrderSerializer(serializers.ModelSerializer):
         payment = validated_data.get('payment', 0)
         is_takeaway = validated_data.get('is_takeaway', 0)
         comment = validated_data.get('comment', '-')
-
         order = create_order_from_json(
             table=table,
             order_items=order_items,

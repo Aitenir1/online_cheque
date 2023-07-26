@@ -46,11 +46,11 @@ def create_order_from_json(
             order_item_obj.save()
 
             total_price += dish.price * quantity
-            order.total_price = total_price
+        order.total_price = total_price
 
-            order.save()
+        order.save()
 
-            return order
+        return order
 
     except serializers.ValidationError:
         print("Error has occured during creating a new Order")
