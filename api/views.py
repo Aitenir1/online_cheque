@@ -22,7 +22,8 @@ class OrderCreateApi(generics.CreateAPIView):
 
 
 class OrderStatusUpdateApi(generics.UpdateAPIView):
-    def put(self, request, *args, **kwargs):
+
+    def patch(self, request, *args, **kwargs):
         pk = kwargs['pk']
         try:
             order = Order.objects.get(pk=pk)
