@@ -7,13 +7,18 @@ from rest_framework import generics, status
 
 # Local Django
 from .models import Dish, Order
-from .serializers import DishSerializer, OrderSerializer, OrderGetSerializer
+from .serializers import DishSerializer, DishCreateSerializer,OrderSerializer, OrderGetSerializer
 from .utils.pagination import OrderGetApiPagination
 
 
 class DishListApi(generics.ListAPIView):
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
+
+
+class DishCreateApi(generics.CreateAPIView):
+    queryset = Dish.objects.all()
+    serializer_class = DishCreateSerializer
 
 
 class OrderCreateApi(generics.CreateAPIView):
@@ -36,6 +41,7 @@ class OrderStatusUpdateApi(generics.UpdateAPIView):
         serializer = OrderSerializer(order)
         return Response(serializer.data, status.HTTP_200_OK)
 
+
 class OrderListApi(generics.ListAPIView):
     serializer_class = OrderGetSerializer
     pagination_class = OrderGetApiPagination
@@ -44,7 +50,6 @@ class OrderListApi(generics.ListAPIView):
 
         date = self.request.query_params.get('date')
         if date is not None:
-            print(date)
             orders = Order.objects.annotate(
                 date=TruncDate('time_created')
             ).filter(date=date)

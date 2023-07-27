@@ -28,7 +28,7 @@ class Dish(models.Model):
     description_ru = models.TextField(default='Еда')
     price = models.FloatField()
     gram = models.CharField(max_length=100, default='200')
-    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    category = models.ForeignKey('Category', blank=True, null=True, on_delete=models.CASCADE)
     image = models.ImageField(default='food1.png', upload_to='dishes/')
     is_trend = models.IntegerField(choices=TREND_CHOINCES, default=0)
 

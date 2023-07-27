@@ -10,10 +10,10 @@ from .json_encoders import UUIDEncoder
 from .utils.order_create_logic import create_order_from_json
 
 
-class CategorySerializer(serializers.HyperlinkedModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['name']
 
 
 class TableSerializer(serializers.HyperlinkedModelSerializer):
@@ -30,6 +30,7 @@ class AdditiveSerializer(serializers.ModelSerializer):
 
 class DishSerializer(serializers.HyperlinkedModelSerializer):
     category_name = serializers.SerializerMethodField()
+    # category = CategorySerializer()
     additives = AdditiveSerializer(many=True)
 
     class Meta:
@@ -43,6 +44,20 @@ class DishSerializer(serializers.HyperlinkedModelSerializer):
     def get_category_name(obj):
         return obj.category.name
 
+
+class DishCreateSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
+    class Meta:
+        model = Dish
+        fields = '__all__'
+
+    def create(self, validated_data):
+        category, created = Category.objects.get_or_create(name=validated_data.pop('category').get('name'))
+        dish = Dish.objects.create(**validated_data)
+        dish.category = category
+
+        return dish
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,7 +91,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return order
 
-
     def notify_consumer(self, instance) -> None:
         channel_layer = get_channel_layer()
 
@@ -91,7 +105,6 @@ class OrderSerializer(serializers.ModelSerializer):
             }
         )
 
-
 class OrderItemGetSerializer(serializers.ModelSerializer):
     dish = DishSerializer()
     additives = AdditiveSerializer(many=True)
@@ -105,4 +118,4 @@ class OrderGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ['id', 'table', 'time_created', 'status', 'comment', 'payment', 'is_takeaway', 'total_price', 'items']
