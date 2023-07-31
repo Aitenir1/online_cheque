@@ -132,3 +132,6 @@ class OrderGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'table', 'time_created', 'status', 'comments', 'payment', 'is_takeaway', 'total_price', 'items']
+
+
+# сlass CategorySerializer

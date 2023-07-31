@@ -6,9 +6,14 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 
 # Local Django
-from .models import Dish, Order
-from .serializers import DishSerializer, DishCreateSerializer,OrderSerializer, OrderGetSerializer
+from .models import Dish, Order, Category
+from .serializers import DishSerializer, DishCreateSerializer, OrderSerializer, OrderGetSerializer, CategorySerializer
 from .utils.pagination import OrderGetApiPagination
+
+
+class CategoryListApi(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class DishListApi(generics.ListAPIView):
