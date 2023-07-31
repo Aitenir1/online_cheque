@@ -65,6 +65,18 @@ class Category(models.Model):
         return f"{self.name}"
 
 
+class OrderComment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    order = models.ForeignKey('Order', related_name='comments', on_delete=models.CASCADE)
+    body = models.TextField(default='-')
+
+    def __str__(self):
+        return f"{self.body}"
+
+    class Meta:
+        db_table = 'order_comment'
+
+
 class Order(models.Model):
 
     STATUS_CHOICES = (
@@ -86,7 +98,7 @@ class Order(models.Model):
     table = models.ForeignKey('Table', on_delete=models.DO_NOTHING)
     time_created = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
-    comment = models.TextField(default="-")
+    # comment = models.TextField(default="-")
     is_takeaway = models.IntegerField(choices=TAKEAWAY_CHOICES, default=0)
     payment = models.IntegerField(choices=PAYMENT_CHOICES, default=0)
     total_price = models.PositiveIntegerField(default=0, blank=True, null=True, editable=False)

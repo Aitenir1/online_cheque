@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from ..models import Table, Order, OrderItem
+from ..models import Table, Order, OrderItem, OrderComment
 
 def create_order_from_json(
         table: Table,
@@ -46,9 +46,12 @@ def create_order_from_json(
             order_item_obj.save()
 
             total_price += dish.price * quantity
+
         order.total_price = total_price
 
         order.save()
+
+        OrderComment.objects.create(order=order, body=comment)
 
         return order
 

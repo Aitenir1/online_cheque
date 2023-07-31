@@ -5,7 +5,7 @@ import json
 from rest_framework import serializers
 from channels.layers import get_channel_layer
 
-from .models import Dish, Category, Table, Order, OrderItem, Additive
+from .models import Dish, Category, Table, Order, OrderItem, Additive, OrderComment
 from .json_encoders import UUIDEncoder
 from .utils.order_create_logic import create_order_from_json
 
@@ -27,6 +27,12 @@ class AdditiveSerializer(serializers.ModelSerializer):
         model = Additive
         fields = '__all__'
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderComment
+        # fields = ['id', 'body']
+        fields = ['body']
 
 class DishSerializer(serializers.HyperlinkedModelSerializer):
     category_name = serializers.SerializerMethodField()
@@ -67,18 +73,23 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    # comments = CommentSerializer(many=True, required=False)
+    # comment = serializers.SerializerMethodField('_get_comment')
+    comment = serializers.CharField()
     time_created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
 
     class Meta:
         model = Order
-        fields = ['id', 'table', 'time_created', 'status', 'comment', 'payment', 'is_takeaway', 'total_price', 'items']
+        fields = ['id', 'table', 'time_created', 'status', 'payment', 'is_takeaway', 'total_price', 'items', 'comment']
 
     def create(self, validated_data: dict):
+        print(validated_data)
         table = validated_data.pop('table')
         order_items = validated_data.pop('items')
         payment = validated_data.get('payment', 0)
         is_takeaway = validated_data.get('is_takeaway', 0)
         comment = validated_data.get('comment', '-')
+
         order = create_order_from_json(
             table=table,
             order_items=order_items,
@@ -86,7 +97,7 @@ class OrderSerializer(serializers.ModelSerializer):
             is_takeaway=is_takeaway,
             comment=comment
         )
-
+        # print(comment)
         self.notify_consumer(instance=order)
 
         return order
@@ -113,9 +124,11 @@ class OrderItemGetSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['dish', 'quantity', 'additives']
 
+
 class OrderGetSerializer(serializers.ModelSerializer):
     items = OrderItemGetSerializer(many=True)
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'table', 'time_created', 'status', 'comment', 'payment', 'is_takeaway', 'total_price', 'items']
+        fields = ['id', 'table', 'time_created', 'status', 'comments', 'payment', 'is_takeaway', 'total_price', 'items']
