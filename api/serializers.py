@@ -97,8 +97,8 @@ class OrderSerializer(serializers.ModelSerializer):
             is_takeaway=is_takeaway,
             comment=comment
         )
-        # print(comment)
-        self.notify_consumer(instance=order)
+
+        # self.notify_consumer(instance=order)
 
         return order
 
@@ -132,6 +132,3 @@ class OrderGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'table', 'time_created', 'status', 'comments', 'payment', 'is_takeaway', 'total_price', 'items']
-
-
-# сlass CategorySerializer

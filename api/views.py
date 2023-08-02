@@ -1,15 +1,24 @@
 # Thrid-party
+import sh
 
 # Django
 from django.db.models.functions import TruncDate
 from rest_framework.response import Response
 from rest_framework import generics, status
+from rest_framework.views import APIView
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 # Local Django
 from .models import Dish, Order, Category
 from .serializers import DishSerializer, DishCreateSerializer, OrderSerializer, OrderGetSerializer, CategorySerializer
-from .utils.pagination import OrderGetApiPagination
 
+from .utils.print_receipt import print_receipt
+
+
+# Utils
+from .utils.pagination import OrderGetApiPagination
+from .utils.print_receipt import print_receipt
 
 class CategoryListApi(generics.ListAPIView):
     queryset = Category.objects.all()
@@ -43,7 +52,10 @@ class OrderStatusUpdateApi(generics.UpdateAPIView):
         order.status = 1
         order.save()
 
-        serializer = OrderSerializer(order)
+        print_receipt(order)
+
+        serializer = OrderGetSerializer(order)
+
         return Response(serializer.data, status.HTTP_200_OK)
 
 
@@ -68,3 +80,18 @@ class OrderActiveListApi(generics.ListAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(status=0)
+
+
+class ReceiptPrintApi(APIView):
+    def post(self, request):
+        order_id = request.data.get('order_id')
+
+        if order_id is None:
+            return Response({"Message": "order_id can not be None"})
+        print(order_id)
+        order_to_print = Order.objects.get(pk=order_id)
+
+        print_receipt(order_to_print)
+
+        return Response({"Message": "Receipt was printer successfully"})
+

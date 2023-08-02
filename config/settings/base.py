@@ -10,9 +10,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = True
 
-# ALLOWED_HOSTS = ['*']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +40,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # This allows requests from all origins.
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 

@@ -11,7 +11,8 @@ from .views import (
     OrderCreateApi,
     OrderListApi,
     OrderActiveListApi,
-    OrderStatusUpdateApi
+    OrderStatusUpdateApi,
+    ReceiptPrintApi
 )
 
 schema_view = get_schema_view(
@@ -36,4 +37,6 @@ urlpatterns = [
     path("orders/", OrderListApi.as_view()),
     path("active-orders/", OrderActiveListApi.as_view()),
     path("orders/<str:pk>/status/", OrderStatusUpdateApi.as_view(), name='order_status'),
+    path("print-receipt/", ReceiptPrintApi.as_view())
+    # path('print-receipt/<str:pk>/', )
 ]
