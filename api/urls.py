@@ -12,6 +12,7 @@ from .views import (
     OrderListApi,
     OrderActiveListApi,
     OrderStatusUpdateApi,
+    OrderWeekListApi,
     ReceiptPrintApi
 )
 
@@ -37,6 +38,7 @@ urlpatterns = [
     path("orders/", OrderListApi.as_view()),
     path("active-orders/", OrderActiveListApi.as_view()),
     path("orders/<str:pk>/status/", OrderStatusUpdateApi.as_view(), name='order_status'),
+    path("orders-week/", OrderWeekListApi.as_view()),
     path("print-receipt/", ReceiptPrintApi.as_view())
     # path('print-receipt/<str:pk>/', )
 ]

@@ -2,18 +2,18 @@
 import sh
 
 # Django
+from django.utils import timezone
 from django.db.models.functions import TruncDate
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from django.template.loader import render_to_string
-from django.http import HttpResponse
+
+
 
 # Local Django
 from .models import Dish, Order, Category
 from .serializers import DishSerializer, DishCreateSerializer, OrderSerializer, OrderGetSerializer, CategorySerializer
 
-from .utils.print_receipt import print_receipt
 
 
 # Utils
@@ -94,4 +94,17 @@ class ReceiptPrintApi(APIView):
         print_receipt(order_to_print)
 
         return Response({"Message": "Receipt was printer successfully"})
+
+
+class OrderWeekListApi(generics.ListAPIView):
+    serializer_class = OrderGetSerializer
+
+    def get_queryset(self):
+        end_date = timezone.now()
+        start_date = end_date - timezone.timedelta(days=2)
+
+        print(f"START: {start_date}")
+        print(f"END:   {end_date}")
+
+        return Order.objects.filter(time_created__range=[start_date, end_date])
 
