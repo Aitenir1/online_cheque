@@ -101,7 +101,7 @@ class OrderWeekListApi(generics.ListAPIView):
 
     def get_queryset(self):
         end_date = timezone.now()
-        start_date = end_date - timezone.timedelta(days=2)
+        start_date = end_date - timezone.timedelta(days=7)
 
         print(f"START: {start_date}")
         print(f"END:   {end_date}")
