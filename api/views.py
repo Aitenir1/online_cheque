@@ -9,11 +9,9 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 
 
-
 # Local Django
 from .models import Dish, Order, Category
 from .serializers import DishSerializer, DishCreateSerializer, OrderSerializer, OrderGetSerializer, CategorySerializer
-
 
 
 # Utils
@@ -59,20 +57,12 @@ class OrderStatusUpdateApi(generics.UpdateAPIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-class OrderListApi(generics.ListAPIView):
-    serializer_class = OrderGetSerializer
-    pagination_class = OrderGetApiPagination
-
-    def get_queryset(self):
-
-        date = self.request.query_params.get('date')
-        if date is not None:
-            orders = Order.objects.annotate(
-                date=TruncDate('time_created')
-            ).filter(date=date)
-
-            return orders
-        return Order.objects.all()
+# class OrderListApi(generics.ListAPIView):
+#     serializer_class = OrderGetSerializer
+#     pagination_class = OrderGetApiPagination
+#
+#     def get_queryset(self):
+#         return Order.objects.all()
 
 
 class OrderActiveListApi(generics.ListAPIView):
@@ -96,15 +86,48 @@ class ReceiptPrintApi(APIView):
         return Response({"Message": "Receipt was printer successfully"})
 
 
-class OrderWeekListApi(generics.ListAPIView):
+class OrderListApi(generics.ListAPIView):
     serializer_class = OrderGetSerializer
+    pagination_class = OrderGetApiPagination
 
     def get_queryset(self):
-        end_date = timezone.now()
-        start_date = end_date - timezone.timedelta(days=7)
+        # param to get a list of Orders for current month or week
+        period = self.request.query_params.get('period')
 
-        print(f"START: {start_date}")
-        print(f"END:   {end_date}")
+        # param to get a list of Orders for a certain day
+        date = self.request.query_params.get('date')
 
-        return Order.objects.filter(time_created__range=[start_date, end_date])
+        # params to get the list of Orders of a certain interval
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
 
+        if not (start_date is None or end_date is None):
+            print(f"START DATE: {start_date}")
+            print(f"END DATE: {end_date}")
+            return Order.objects.filter(time_created__range=[start_date, end_date])
+
+        if date is not None:
+            print(f"DATE: {date}")
+            orders = Order.objects.annotate(
+                date=TruncDate('time_created')
+            ).filter(date=date)
+
+            return orders
+
+        if period == 'month':
+            current_month = timezone.now().month
+            current_year = timezone.now().year
+            print(f"CURRENT MONTH: {current_month}")
+            print(f"CURRENT YEAR: {current_year}")
+            return Order.objects.filter(time_created__month=current_month, time_created__year=current_year)
+
+        if period == 'week':
+            end_date = timezone.now()
+            start_date = end_date - timezone.timedelta(days=7)
+
+            print(f"START: {start_date}")
+            print(f"END:   {end_date}")
+
+            return Order.objects.filter(time_created__range=[start_date, end_date])
+
+        return Order.objects.all()
