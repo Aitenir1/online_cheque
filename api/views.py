@@ -50,7 +50,7 @@ class OrderStatusUpdateApi(generics.UpdateAPIView):
         order.status = 1
         order.save()
 
-        print_receipt(order)
+        print_receipt(customer=True, order=order)
 
         serializer = OrderGetSerializer(order)
 
@@ -81,14 +81,20 @@ class ReceiptPrintApi(APIView):
         print(order_id)
         order_to_print = Order.objects.get(pk=order_id)
 
-        print_receipt(order_to_print)
+        print_receipt(customer=True, order=order_to_print)
 
         return Response({"Message": "Receipt was printer successfully"})
 
 
 class OrderListApi(generics.ListAPIView):
+    queryset = Order.objects.all()
     serializer_class = OrderGetSerializer
     pagination_class = OrderGetApiPagination
+
+
+class OrderFilterListApi(generics.ListAPIView):
+    serializer_class = OrderGetSerializer
+    # pagination_class = OrderGetApiPagination
 
     def get_queryset(self):
         # param to get a list of Orders for current month or week
@@ -130,4 +136,4 @@ class OrderListApi(generics.ListAPIView):
 
             return Order.objects.filter(time_created__range=[start_date, end_date])
 
-        return Order.objects.all()
+        # return Order.objects.all()

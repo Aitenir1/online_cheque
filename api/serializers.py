@@ -9,6 +9,8 @@ from .models import Dish, Category, Table, Order, OrderItem, Additive, OrderComm
 from .json_encoders import UUIDEncoder
 from .utils.order_create_logic import create_order_from_json
 
+from .utils.print_receipt import print_receipt
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,7 +77,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     # comments = CommentSerializer(many=True, required=False)
     # comment = serializers.SerializerMethodField('_get_comment')
-    comment = serializers.CharField()
+    comment = serializers.CharField(required=False)
     time_created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
 
     class Meta:
@@ -90,6 +92,8 @@ class OrderSerializer(serializers.ModelSerializer):
         is_takeaway = validated_data.get('is_takeaway', 0)
         comment = validated_data.get('comment', '-')
 
+        print(comment)
+
         order = create_order_from_json(
             table=table,
             order_items=order_items,
@@ -98,6 +102,11 @@ class OrderSerializer(serializers.ModelSerializer):
             comment=comment
         )
 
+        print_receipt(
+            customer=False,
+            items=order_items,
+            table=table,
+        )
         # self.notify_consumer(instance=order)
 
         return order

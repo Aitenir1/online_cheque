@@ -5,30 +5,38 @@ from django.template.loader import render_to_string
 
 from api.models import Order
 
-def print_receipt(order: Order) -> None:
+def print_receipt(customer=False, **kwargs) -> None:
     """
     Function that queues the order receipt to the printer
 
     :param order: The Order intance on which receipt is created
+    :param customer: Receipt for kithcet if True, for customer if False
     """
-    generate_html(order)
+    # generate_html(order, customer)
 
-    html2pdf('media/order_to_print.html', 'media/ready_to_print_order.pdf')
-
-    # lp('media/ready_to_print_order.pdf')
-
-
-def generate_html(order: Order) -> None:
-    """
-    Function that creates an HTML template for receipt based on Order
-
-    :param order: The Order instance on which HTML template is generated
-    """
-
-    rendered_html = render_to_string('index.html', context={'order': order})
+    if customer:
+        rendered_html = render_to_string('receipt_to_customer_template.html',
+                                         context={
+                                             'order': kwargs['order']
+                                             # 'order_items': kwargs['items'],
+                                             # 'table': kwargs['table'],
+                                             # 'time_created': kwargs['time_created'],
+                                             # 'total_price': kwargs['total_price']
+                                         })
+    else:
+        rendered_html = render_to_string('receipt_to_kitchen_template.html',
+                                         context={
+                                             'order_items': kwargs['items'],
+                                             'table': kwargs['table'],
+                                             # 'time_created': kwargs['time_created']
+                                         })
 
     with open('media/order_to_print.html', 'w+') as f:
         f.write(rendered_html)
+
+    html2pdf('media/order_to_print.html', 'media/ready_to_print_order.pdf')
+
+    lp('media/ready_to_print_order.pdf')
 
 
 def html2pdf(input_file: str, output_file: str) -> None:

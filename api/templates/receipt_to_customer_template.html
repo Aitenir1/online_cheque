@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+        }
+        .receipt {
+            width: 58mm;
+            padding: 5px;
+
+        }
+        .header {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .content {
+            margin-bottom: 5px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .item-name {
+            flex: 1;
+        }
+        .item-price {
+            flex: 0;
+            white-space: nowrap;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+{#  <div class='modal-two'>#}
+{#    <div class="modal-start">#}
+{#      <div class="modal-table">#}
+{#        <h4>Стол #{{ order.table }}</h4>#}
+{#      </div>#}
+{#      <div class="modal-date">#}
+{#        <h4>19.04.2004</h4>#}
+{#        <h5>Открыт: <span>{{ order.time_created }}</span> </h5>#}
+{#      </div>#}
+{#    </div>#}
+{#  <hr />#}
+{#  <table>#}
+{#  {% for item in order.items.all %}#}
+{#        <tr>#}
+{#        <td class='foods--title'>{{ item.dish.name_ru }}</td>#}
+{#        <td class='modal-colls'>{{ item.quantity }}</td>#}
+{#        </tr>#}
+{#  {% endfor %}#}
+{##}
+{##}
+
+
+<div class="receipt">
+    <div class="header">
+        Motion-Web Academy
+    </div>
+    <div class="content">
+        {% for item in order.items.all %}
+
+        <div class="item">
+            <div class="item-name">{{ item.dish.name_ru|truncatechars:25 }} x{{ item.quantity }}</div>
+            <div class="item-price">{{ item.dish.price }}с.</div>
+        </div>
+        {% endfor %}
+
+        <!-- Add more items here if needed -->
+    </div>
+    <div class="total">
+        Счет: {{ order.total_price }}
+    </div>
+
+    <div class="comments">
+        {% for comment in order.comments.all %}
+            <div class="comment">{{ comment.body }}</div>
+        {% endfor %}
+    </div>
+
+
+</div>
+{##}
+{#<h1>Блюда:</h1>#}
+{#{% for item in order.items.all %}#}
+{#    <h3>{{ item.dish.name_ru }}</h3>#}
+{#{% endfor %}#}
+{##}
+{#<hr>#}
+{##}
+{#{% for comment in order.comments.all %}#}
+{#    <p>{{ comment.body }}</p>#}
+{#{% endfor %}#}
+{##}
+{#  <hr/>#}
+{#      {% for comment in order.comments.all %}#}
+{#        <tr class='modal-tr'>#}
+{#  <td>Комментарий: {{ comment.body}}</td>#}
+{#  </tr>#}
+{#    {% endfor %}#}
+{#    </table>#}
+{#</div>#}
+</body>
+</html>

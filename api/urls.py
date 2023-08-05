@@ -10,9 +10,11 @@ from .views import (
     CategoryListApi,
     OrderCreateApi,
     OrderListApi,
+    OrderFilterListApi,
     OrderActiveListApi,
     OrderStatusUpdateApi,
-    ReceiptPrintApi
+    ReceiptPrintApi,
+
 )
 
 schema_view = get_schema_view(
@@ -34,6 +36,7 @@ urlpatterns = [
     path("categories/", CategoryListApi.as_view()),
     path("create-dish/", DishCreateApi.as_view()),
     path("create-order/", OrderCreateApi.as_view()),
+    path("orders-filter/", OrderFilterListApi.as_view()),
     path("orders/", OrderListApi.as_view()),
     path("active-orders/", OrderActiveListApi.as_view()),
     path("orders/<str:pk>/status/", OrderStatusUpdateApi.as_view(), name='order_status'),

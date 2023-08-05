@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+ <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+        }
+        .receipt {
+            width: 58mm;
+            padding: 5px;
+
+        }
+        .header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            {#margin-bottom: px;#}
+        }
+        .content {
+            margin-bottom: 5px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .item-name {
+            flex: 1;
+        }
+        .item-price {
+            flex: 0;
+            white-space: nowrap;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+<body>
+
+
+<div class="receipt">
+    <h1 class="header">
+        Motion-Web Academy
+    </h1>
+
+    <h2>Стол: {{ table }}</h2>
+
+    <div class="content">
+        {% for item in order_items %}
+
+        <div class="item">
+            <div class="item-name">{{ item.dish.name_ru|truncatechars:25 }} x{{ item.quantity }}</div>
+        </div>
+        {% endfor %}
+
+        <!-- Add more items here if needed -->
+    </div>
+    <div class="total">
+    </div>
+
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment">{{ comment.body }}</div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+</body>
+</html>

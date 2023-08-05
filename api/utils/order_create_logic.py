@@ -50,8 +50,8 @@ def create_order_from_json(
         order.total_price = total_price
 
         order.save()
-
-        OrderComment.objects.create(order=order, body=comment)
+        if comment != '-':
+            OrderComment.objects.create(order=order, body=comment)
 
         return order
 
