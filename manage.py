@@ -7,7 +7,6 @@ from config.settings import base
 
 def main():
     """Run administrative tasks."""
-    print(base.DEBUG)
     if base.DEBUG:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
     else:

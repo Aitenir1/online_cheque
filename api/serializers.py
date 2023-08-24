@@ -85,14 +85,12 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'table', 'time_created', 'status', 'payment', 'is_takeaway', 'total_price', 'items', 'comment']
 
     def create(self, validated_data: dict):
-        print(validated_data)
         table = validated_data.pop('table')
         order_items = validated_data.pop('items')
         payment = validated_data.get('payment', 0)
         is_takeaway = validated_data.get('is_takeaway', 0)
         comment = validated_data.get('comment', '-')
-
-        print(comment)
+        # print(comment)
 
         order = create_order_from_json(
             table=table,
@@ -106,6 +104,7 @@ class OrderSerializer(serializers.ModelSerializer):
             customer=False,
             items=order_items,
             table=table,
+            comment=comment
         )
         # self.notify_consumer(instance=order)
 

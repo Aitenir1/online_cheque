@@ -17,6 +17,7 @@ from .serializers import DishSerializer, DishCreateSerializer, OrderSerializer, 
 # Utils
 from .utils.pagination import OrderGetApiPagination
 from .utils.print_receipt import print_receipt
+from .utils.orders_report_generate import orders_report_generate
 
 class CategoryListApi(generics.ListAPIView):
     queryset = Category.objects.all()
@@ -78,7 +79,7 @@ class ReceiptPrintApi(APIView):
 
         if order_id is None:
             return Response({"Message": "order_id can not be None"})
-        print(order_id)
+
         order_to_print = Order.objects.get(pk=order_id)
 
         print_receipt(customer=True, order=order_to_print)
@@ -107,10 +108,13 @@ class OrderFilterListApi(generics.ListAPIView):
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
 
+
+        queryset = None
+
         if not (start_date is None or end_date is None):
             print(f"START DATE: {start_date}")
             print(f"END DATE: {end_date}")
-            return Order.objects.filter(time_created__range=[start_date, end_date])
+            queryset = Order.objects.filter(time_created__range=[start_date, end_date])
 
         if date is not None:
             print(f"DATE: {date}")
@@ -118,14 +122,14 @@ class OrderFilterListApi(generics.ListAPIView):
                 date=TruncDate('time_created')
             ).filter(date=date)
 
-            return orders
+            queryset = orders
 
         if period == 'month':
             current_month = timezone.now().month
             current_year = timezone.now().year
             print(f"CURRENT MONTH: {current_month}")
             print(f"CURRENT YEAR: {current_year}")
-            return Order.objects.filter(time_created__month=current_month, time_created__year=current_year)
+            queryset = Order.objects.filter(time_created__month=current_month, time_created__year=current_year)
 
         if period == 'week':
             end_date = timezone.now()
@@ -133,7 +137,14 @@ class OrderFilterListApi(generics.ListAPIView):
 
             print(f"START: {start_date}")
             print(f"END:   {end_date}")
+            # Order.objects.filter(order_item)
 
-            return Order.objects.filter(time_created__range=[start_date, end_date])
+            # Dish.objects.filter(orderitem__order=)
+            # Dish.objects.annotate(Count(''))
+            # Dish.objects.filter(orderitem__order__time_created_)
+            queryset = Order.objects.filter(time_created__range=[start_date, end_date])
 
+        return queryset
         # return Order.objects.all()
+
+

@@ -73,6 +73,7 @@
     <div class="header">
         Motion-Web Academy
     </div>
+<h2>Стол: {{ order.table }}</h2>
     <div class="content">
         {% for item in order.items.all %}
 
@@ -88,11 +89,11 @@
         Счет: {{ order.total_price }}
     </div>
 
-    <div class="comments">
-        {% for comment in order.comments.all %}
-            <div class="comment">{{ comment.body }}</div>
-        {% endfor %}
-    </div>
+{#    <div class="comments">#}
+{#        {% for comment in order.comments.all %}#}
+{#            <div class="comment">{{ comment.body }}</div>#}
+{#        {% endfor %}#}
+{#    </div>#}
 
 
 </div>
