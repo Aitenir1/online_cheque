@@ -57,15 +57,6 @@ class OrderStatusUpdateApi(generics.UpdateAPIView):
 
         return Response(serializer.data, status.HTTP_200_OK)
 
-
-# class OrderListApi(generics.ListAPIView):
-#     serializer_class = OrderGetSerializer
-#     pagination_class = OrderGetApiPagination
-#
-#     def get_queryset(self):
-#         return Order.objects.all()
-
-
 class OrderActiveListApi(generics.ListAPIView):
     serializer_class = OrderGetSerializer
 
@@ -95,7 +86,6 @@ class OrderListApi(generics.ListAPIView):
 
 class OrderFilterListApi(generics.ListAPIView):
     serializer_class = OrderGetSerializer
-    # pagination_class = OrderGetApiPagination
 
     def get_queryset(self):
         # param to get a list of Orders for current month or week
@@ -107,7 +97,6 @@ class OrderFilterListApi(generics.ListAPIView):
         # params to get the list of Orders of a certain interval
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
-
 
         queryset = None
 
@@ -137,14 +126,9 @@ class OrderFilterListApi(generics.ListAPIView):
 
             print(f"START: {start_date}")
             print(f"END:   {end_date}")
-            # Order.objects.filter(order_item)
 
-            # Dish.objects.filter(orderitem__order=)
-            # Dish.objects.annotate(Count(''))
-            # Dish.objects.filter(orderitem__order__time_created_)
             queryset = Order.objects.filter(time_created__range=[start_date, end_date])
 
         return queryset
-        # return Order.objects.all()
 
 
